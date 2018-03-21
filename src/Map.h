@@ -22,6 +22,8 @@ public:
     Map();
     Map(int width, int height);
 
+    int CalculateMoves(int xStart, int yStart);
+
     void SetWidth(int width);
     void SetHeight(int height);
     int GetWidth(void);

@@ -3,6 +3,7 @@
 //
 
 #include "Map.h"
+#include <queue>
 
 Map::Map(){}
 
@@ -11,7 +12,13 @@ map(height),
 width(width),
 height(height){
     for(int i = 0; i < height;++i)
-        map.emplace_back(width);
+        map[i].reserve(width);
+}
+
+
+int Map::CalculateMoves(int xStart, int yStart)
+{
+    return 0;
 }
 
 void Map::SetWidth(int width){
@@ -29,8 +36,7 @@ int Map::GetHeight(void){
 
 void Map::SetXY(int x, int y, CellsTypes type)
 {
-    map[y].size();
-    //map[y][x] = type;
+    map[y][x] = type;
 }
 
 CellsTypes Map::GetTypeFromInt(int input){
