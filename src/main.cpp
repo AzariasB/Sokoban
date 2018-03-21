@@ -9,7 +9,7 @@ Map parseFile(const std::string &mapName)
     mapF.open(mapName);
     if(!mapF.is_open()){
         std::cerr << "File not found " << std::endl;
-        return Map();//;//empty map
+        return Map(0, 0);//;//empty map
     }
 
     int width = 0;
@@ -22,14 +22,13 @@ Map parseFile(const std::string &mapName)
     std::cout << "Width = " << width << " - height = " << height << std::endl;
 
     Map mMap;//(width, height);
-    for(int y = 0; y < height; ++y){
-        for(int x = 0; x < width; ++x){
+    for(int y = 0; y < height; ++y){//read all columns
+        for(int x = 0; x < width; ++x){// read all lines
             int value;
             mapF >> value;
-            mapF.ignore();
-            std::cout << value << " ";
-            //CellsTypes ct = Map::toCellType(value);
-            //mMap.setValue(x,y,ct);
+            mapF.ignore();// comma or \n
+            CellsTypes ct = Map::toCellType(value);
+            mMap.SetXY(x, y, ct);
         }
         std::cout << std::endl;
     }
