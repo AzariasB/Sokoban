@@ -7,12 +7,11 @@
 
 #include <vector>
 
-using namespace std;
-
 enum CellsTypes {
     Empty = 0,
     Wall,
     Box,
+    Target,
     BoxOnTarget,
     Player,
     PlayerOnTarget
@@ -34,7 +33,7 @@ public:
 private:
     int width;
     int height;
-    vector<vector<CellsTypes>> map;
+    std::vector<std::vector<CellsTypes>> map;
 };
 
 
