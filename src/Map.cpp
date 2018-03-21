@@ -38,6 +38,9 @@ void Map::SetXY(int x, int y, CellsTypes type)
 {
     map[y][x] = type;
 }
+CellsTypes Map::GetXY(int x, int y){
+    return map.at(x).at(y);
+}
 
 CellsTypes Map::GetTypeFromInt(int input){
     switch(input){
@@ -59,5 +62,3 @@ CellsTypes Map::GetTypeFromInt(int input){
             return CellsTypes::Wall;
     };
 }
-//void Map::SetXY(int x, int y, CellsTypes type);
-//CellsTypes Map::GetXY(int x, int y);
