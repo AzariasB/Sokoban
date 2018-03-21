@@ -26,17 +26,30 @@ Map parseFile(const std::string &mapName)
         for(int x = 0; x < width; ++x){// read all lines
             int value;
             mapF >> value;
+            std::cout << value << " ";
             mapF.ignore();// comma or \n
-            CellsTypes ct = Map::GetTypeFromInt(value);
-            mMap.SetXY(x, y, ct);
+            if( (value & Player) == Player){
+                mMap.SetStart(x,y);
+            }
+            mMap.SetXY(x, y, value);
         }
+        std::cout << "\n";
     }
 
     mapF.close();
     return mMap;
 }
 
-int main() {
-    parseFile("../data/soko1.txt");
+int main(int argc, char **argv) {
+    std::cout << argc << std::endl;
+
+    if(argc < 2){
+        std::cerr << "Must pass filename in parameter\n";
+        return -1;
+    }
+
+
+    Map m = parseFile(argv[argc]);
+    std::cout << m.CalculateMoves() << std::endl;
     return 0;
 }
