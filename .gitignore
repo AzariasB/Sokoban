@@ -1,5 +1,9 @@
 build
 *.user
+Sokoban.config
+Sokoban.creator
+Sokoban.files
+Sokoban.includes
 
 # Prerequisites
 *.d
