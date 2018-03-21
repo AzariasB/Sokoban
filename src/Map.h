@@ -6,36 +6,47 @@
 #define SOKOBAN_MAP_H
 
 #include <vector>
+#include <queue>
 
 enum CellsTypes {
     Empty = 0,
-    Wall,
-    Box,
-    Target,
-    BoxOnTarget,
-    Player,
-    PlayerOnTarget
+    Box =    1 << 0,
+    Player = 1 << 1,
+    Target = 1 << 2,
+    Wall =   1 << 3
 };
+
+struct Move;
 
 class Map {
 public:
     Map();
     Map(int width, int height);
 
-    int CalculateMoves(int xStart, int yStart);
+    int CalculateMoves();
 
-    void SetWidth(int width);
-    void SetHeight(int height);
-    int GetWidth(void);
-    int GetHeight(void);
+    bool isComplete() const;
 
-    static CellsTypes GetTypeFromInt(int input);
-    void SetXY(int x, int y, CellsTypes type);
+    bool isAccessible(int x, int y, int xDir, int yDir) const;
+
+    void performMove(const Move &mv);
+
+    void SetXY(int x, int y, int type);
+
+    void SetStart(int x, int y);
+
     CellsTypes GetXY(int x, int y);
+
 private:
+    bool isValid(int x, int y) const;
+
+    void addMoves(int x, int y, std::queue<Move> &q, int treeDepth) const;
+
     int width;
     int height;
-    std::vector<std::vector<CellsTypes>> map;
+    std::vector<std::vector<int>> map;
+
+    int xStart, yStart;
 };
 
 
