@@ -122,3 +122,31 @@ bool Map::isAccessible(int x, int y, int xDir, int yDir) const
 
     return isValid(nxtX,nxtY) && map[nxtY][nxtX] == Empty || map[nxtY][nxtX] == Target;
 }
+
+int Map::GetXY(int x, int y){
+    return this->map.at(x).at(y);
+}
+
+int Map::getWidth() const {
+    return width;
+}
+
+void Map::setWidth(int width) {
+    Map::width = width;
+}
+
+int Map::getHeight() const {
+    return height;
+}
+
+void Map::setHeight(int height) {
+    Map::height = height;
+}
+
+const std::vector<std::vector<int>> &Map::getMap() const {
+    return map;
+}
+
+void Map::setMap(const std::vector<std::vector<int>> &map) {
+    Map::map = map;
+}

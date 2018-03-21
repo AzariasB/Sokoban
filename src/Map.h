@@ -23,6 +23,14 @@ public:
     Map();
     Map(int width, int height);
 
+    int getWidth() const;
+
+    void setWidth(int width);
+
+    int getHeight() const;
+
+    void setHeight(int height);
+
     int CalculateMoves();
 
     bool isComplete() const;
@@ -35,7 +43,11 @@ public:
 
     void SetStart(int x, int y);
 
-    CellsTypes GetXY(int x, int y);
+    int GetXY(int x, int y);
+
+    const std::vector<std::vector<int>> &getMap() const;
+
+    void setMap(const std::vector<std::vector<int>> &map);
 
 private:
     bool isValid(int x, int y) const;

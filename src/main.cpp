@@ -2,6 +2,10 @@
 #include <iostream>
 #include <fstream>
 #include "Map.h"
+#include "TileMap.h"
+
+#include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 
 Map parseFile(const std::string &mapName)
 {
@@ -26,14 +30,12 @@ Map parseFile(const std::string &mapName)
         for(int x = 0; x < width; ++x){// read all lines
             int value;
             mapF >> value;
-            std::cout << value << " ";
             mapF.ignore();// comma or \n
             if( (value & Player) == Player){
                 mMap.SetStart(x,y);
             }
             mMap.SetXY(x, y, value);
         }
-        std::cout << "\n";
     }
 
     mapF.close();
@@ -41,15 +43,41 @@ Map parseFile(const std::string &mapName)
 }
 
 int main(int argc, char **argv) {
-    std::cout << argc << std::endl;
 
-    if(argc < 2){
-        std::cerr << "Must pass filename in parameter\n";
-        return -1;
+
+
+    Map map = parseFile("../data/soko1.txt");
+
+    for(unsigned int i = 0; i< map.getHeight();i++){
+        for(unsigned int j = 0; j< map.getWidth();j++){
+            std::cout << map.GetXY(j,i);
+        }
+        std::cout << std::endl;
+
     }
 
+    sf::RenderWindow window(sf::VideoMode(500, 500), "Sokoban");
 
-    Map m = parseFile(argv[argc]);
-    std::cout << m.CalculateMoves() << std::endl;
+    TileMap tilemap;
+    if (!tilemap.load("../data/sprites.png", sf::Vector2u(32, 32), map.getMap(), map.getWidth(), map.getHeight()))
+        return -1;
+
+    // on fait tourner la boucle principale
+    while (window.isOpen())
+    {
+        // on gère les évènements
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if(event.type == sf::Event::Closed)
+                window.close();
+        }
+
+        // on dessine le niveau
+        window.clear();
+        window.draw(tilemap);
+        window.display();
+    }
+
     return 0;
 }
