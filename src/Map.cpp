@@ -4,24 +4,34 @@
 
 #include "Map.h"
 
-Map::Map(){};
-Map::Map(int width, int height){
-    this->width = width;
-    this->height = height;
-};
+Map::Map(){}
+
+Map::Map(int width, int height):
+map(height),
+width(width),
+height(height){
+    for(int i = 0; i < height;++i)
+        map.emplace_back(width);
+}
 
 void Map::SetWidth(int width){
   this->width = width;
-};
+}
 void Map::SetHeight(int height){
   this->height = height;
-};
+}
 int Map::GetWidth(void){
-    return this->width;
-};
+    return width;
+}
 int Map::GetHeight(void){
-    return this->height;
-};
+    return height;
+}
+
+void Map::SetXY(int x, int y, CellsTypes type)
+{
+    map[y].size();
+    //map[y][x] = type;
+}
 
 CellsTypes Map::GetTypeFromInt(int input){
     switch(input){
@@ -36,12 +46,12 @@ CellsTypes Map::GetTypeFromInt(int input){
         case 5:
             return CellsTypes::BoxOnTarget;
         case 6:
-            return CellsTypes::PlayerOnTarget
+            return CellsTypes::PlayerOnTarget;
         case 8:
             return CellsTypes::Wall;
         default:
             return CellsTypes::Wall;
     };
-};
+}
 //void Map::SetXY(int x, int y, CellsTypes type);
 //CellsTypes Map::GetXY(int x, int y);

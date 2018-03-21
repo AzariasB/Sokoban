@@ -21,17 +21,18 @@ Map parseFile(const std::string &mapName)
 
     std::cout << "Width = " << width << " - height = " << height << std::endl;
 
-    Map mMap;//(width, height);
+    Map mMap(width, height);
     for(int y = 0; y < height; ++y){//read all columns
         for(int x = 0; x < width; ++x){// read all lines
             int value;
             mapF >> value;
             mapF.ignore();// comma or \n
-            CellsTypes ct = Map::toCellType(value);
+            CellsTypes ct = Map::GetTypeFromInt(value);
             mMap.SetXY(x, y, ct);
         }
-        std::cout << std::endl;
     }
+
+    mapF.close();
     return mMap;
 }
 

@@ -27,7 +27,7 @@ public:
     int GetWidth(void);
     int GetHeight(void);
 
-    CellsTypes GetTypeFromInt(int input);
+    static CellsTypes GetTypeFromInt(int input);
     void SetXY(int x, int y, CellsTypes type);
     CellsTypes GetXY(int x, int y);
 private:
