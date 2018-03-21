@@ -10,7 +10,7 @@ void Window::create_window(std::vector<std::vector<int>> map){
     sf::RenderWindow window(sf::VideoMode(500, 500), "Sokoban");
 
 
-    if (!this->tilemap.load("../data/sprites.png", sf::Vector2u(32, 32), map, map.data()->size(), map.size()))
+    if (!this->tilemap.load("../data/sprites.png", sf::Vector2u(64, 64), map, map.data()->size(), map.size()))
         std::cerr << "File of sprites not found " << std::endl;
 
     // on fait tourner la boucle principale
