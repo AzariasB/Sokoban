@@ -1,10 +1,11 @@
 
 #include <iostream>
 #include <fstream>
+#include <stack>
 #include "State.hpp"
 #include "Map.h"
 
-Map parseFile(const std::string &mapName, State &rootState)
+Map parseFile(const std::string &mapName)
 {
     std::ifstream mapF;
     mapF.open(mapName);
@@ -45,21 +46,42 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    State root;
-    Map m = parseFile(argv[1], root);
-    root.extractFrom(m);
-    std::queue<State> states;
+    std::shared_ptr<State> root = std::make_shared<State>();
+    Map m = parseFile(argv[1]);
+    root->extractFrom(m);
+
+    std::queue<std::shared_ptr<State>> states;
+    ancestors anc;
+    std::shared_ptr<State> finalState = {};
+
     states.push(root);
     while(!states.empty()){
-        State &next = states.front();
-        if(next.isSolutionOf(m)){
-            std::cout << "Found solution !" << std::endl;
-            next.applyTo(m);
-            std::cout << m.toString() << "\n";
+        auto &next = states.front();
+        if(next->isSolutionOf(m)){
+            finalState = next;
             break;
         }
-        next.computeNextStates(m, states);
+        next->computeNextStates(m, next, states, anc);
         states.pop();
+    }
+
+    std::stack<std::shared_ptr<State>> order;
+    State dummy;
+    if(finalState){
+        std::cout << "Found solution !\n";
+        while(finalState != root){
+            order.emplace(finalState);
+            finalState = anc[finalState];
+        }
+        order.emplace(root);
+
+        while(!order.empty()){
+            auto &st = order.top();
+            order.pop();
+            st->applyTo(m);
+            std::cout << m.toString() << "\n";
+            dummy.extractFrom(m);
+        }
     }
 
     return 0;

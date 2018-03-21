@@ -84,15 +84,15 @@ void State::applyMove(const Point &move, Map &map)
     }
 }
 
-void State::computeNextStates(Map &map, std::queue<State> &stateQueue)
+void State::computeNextStates(Map &map, std::shared_ptr<State> &pred, std::queue<std::shared_ptr<State>> &stateQueue, ancestors &anc)
 {
-    //up
     for(const Point &card : CARDINALS){
         if(map.isAccessible(m_ppos, card)){
             applyTo(map);
             applyMove(card, map);
-            stateQueue.emplace();
-            stateQueue.back().extractFrom(map);
+            stateQueue.emplace(std::make_shared<State>());
+            anc[stateQueue.back()] = pred;
+            stateQueue.back()->extractFrom(map);
         }
     }
 }

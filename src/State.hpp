@@ -34,11 +34,16 @@
 #include <list>
 #include <vector>
 #include <queue>
+#include <memory>
+#include <unordered_map>
 #include <array>
 
 typedef signed char int8;
 
 class Map;
+class State;
+using ancestors = std::unordered_map<std::shared_ptr<State>, std::shared_ptr<State>>;
+
 
 enum CellsTypes {
     Empty  = 0,
@@ -72,7 +77,7 @@ public:
 
     void applyMove(const Point & move, Map &map);
 
-    void computeNextStates(Map &map, std::queue<State> &stateQueu);
+    void computeNextStates(Map &map, std::shared_ptr<State> &pred, std::queue<std::shared_ptr<State> > &stateQueue, ancestors &anc);
 
     void extractFrom(Map &map);
 
