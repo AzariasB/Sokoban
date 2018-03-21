@@ -6,9 +6,6 @@
 #include <sstream>
 #include <iostream>
 
-static Move emptyMove;
-
-
 char toChar(int cCode)
 {
     if(cCode == Wall){
@@ -19,8 +16,10 @@ char toChar(int cCode)
         return 'o';
     }else if(cCode == Target){
         return 'x';
-    }else if(cCode == (Target | Box)){
+    }else if(cCode == (Target | Box)) {
         return '+';
+    }else if(cCode == (Target | Player)){
+        return 'Q';
     }else{
         return ' ';
     }
@@ -29,18 +28,26 @@ char toChar(int cCode)
 Map::Map(){}
 
 Map::Map(int width, int height):
-map(height),
-m_width(width),
-height(height){
+map(height){
     for(int i = 0; i < height;++i)
         map[i].resize(width);
+}
+
+int &Map::at(const Point &p)
+{
+    return map[p.y][p.x];
+}
+
+const int &Map::at(const Point &p) const
+{
+    return map[p.y][p.x];
 }
 
 std::string Map::toString() const
 {
     std::stringstream ss;
-    for(int y = 0; y < height; ++y){
-        for(int x = 0; x < m_width; ++x){
+    for(int y = 0; y < map.size(); ++y){
+        for(int x = 0; x < map[y].size(); ++x){
             ss << toChar(map[y][x]);
         }
         ss << "\n";
@@ -49,90 +56,21 @@ std::string Map::toString() const
     return ss.str();
 }
 
-void Map::addMoves(int x, int y, std::queue<Move> &q, int treeDepth) const
+
+bool Map::isValid(const Point &p) const
 {
-    //right
-    if(isAccessible(x+1,y,1,0)) q.emplace(x,y,1,0, treeDepth, *this);
-
-    //left
-    if(isAccessible(x-1,y,-1,0)) q.emplace(x,y,-1,0, treeDepth, *this);
-
-    //up
-    if(isAccessible(x,y-1,0,-1))q.emplace(x,y,0,-1, treeDepth, *this);
-
-    //down
-    if(isAccessible(x,y+1,0,1))q.emplace(x,y,0,1, treeDepth, *this);
+    return p.x >= 0 && p.y >= 0 && p.x < map[0].size() && p.y < map.size();
 }
 
-void Map::performMove(const Move &mv)
+bool Map::isAccessible(const Point &origin, const Point &dir) const
 {
-    map[mv.y][mv.x] ^= Player;
-    int nxtX = mv.x + mv.dx;
-    int nxtY = mv.y + mv.dy;
-
-    if(map[nxtY][nxtX] == Box){//Move the box
-        int nwBoxPosX = nxtX + mv.dx;
-        int nwBoxPosY = nxtY + mv.dy;
-
-        map[nwBoxPosY][nwBoxPosX] |= Box;
-        map[nxtY][nxtX] ^= Box;
-    }
-    map[nxtY][nxtX] |= Player;
-}
-
-
-void Map::SetStart(int x, int y)
-{
-    xStart = x;
-    yStart = y;
-}
-
-Move Map::CalculateMoves()
-{
-    std::queue<Move> nxtMoves;
-    addMoves(xStart, yStart, nxtMoves, 0);
-
-    while(!nxtMoves.empty()){
-        Move &m = nxtMoves.front();
-        m.performMove();
-        if(m.originalMap.isComplete())
-            return nxtMoves.front();
-        m.originalMap.addMoves(m.x + m.dx, m.y + m.dy, nxtMoves, m.index+1);
-        nxtMoves.pop();
-    }
-    return emptyMove;
-}
-
-void Map::SetXY(int x, int y, int type)
-{
-    map[y][x] = type;
-}
-
-
-bool Map::isComplete() const
-{
-    for(auto &vec : map){
-        for(auto i : vec){
-            if(i == Target)return false;
-        }
-    }
-    return true;
-}
-
-bool Map::isValid(int x, int y) const
-{
-    return x >= 0 && y >= 0 && x < m_width && y < height;
-}
-
-bool Map::isAccessible(int x, int y, int xDir, int yDir) const
-{
-    if(!isValid(x,y))return false;
-    int cellVal = map[y][x];
+    Point p = origin + dir;
+    if(!isValid(p))return false;
+    int cellVal = map[p.y][p.x];
     if((cellVal & Wall) == Wall)return false;//can't go on wall
     if(cellVal == Empty || cellVal == Target)return true;//can go on empty places, or empty target
     //else => is Box : see if we can push it
-    int nxtX = x+xDir;
-    int nxtY = y+yDir;
+    Point nxtPos = p + dir;
 
-    return isValid(nxtX,nxtY) && map[nxtY][nxtX] == Empty || map[nxtY][nxtX] == Target;
+    return isValid(nxtPos) && map[nxtPos.y][nxtPos.x] == Empty || map[nxtPos.y][nxtPos.x] == Target;
 }

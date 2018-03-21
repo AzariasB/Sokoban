@@ -1,9 +1,10 @@
 
 #include <iostream>
 #include <fstream>
+#include "State.hpp"
 #include "Map.h"
 
-Map parseFile(const std::string &mapName)
+Map parseFile(const std::string &mapName, State &rootState)
 {
     std::ifstream mapF;
     mapF.open(mapName);
@@ -27,10 +28,7 @@ Map parseFile(const std::string &mapName)
             int value;
             mapF >> value;
             mapF.ignore();// comma
-            if( (value & Player) == Player){
-                mMap.SetStart(x,y);
-            }
-            mMap.SetXY(x, y, value);
+            mMap.at(Point(x,y)) = value;
         }
         mapF.ignore();// \n
     }
@@ -47,11 +45,22 @@ int main(int argc, char **argv) {
         return -1;
     }
 
+    State root;
+    Map m = parseFile(argv[1], root);
+    root.extractFrom(m);
+    std::queue<State> states;
+    states.push(root);
+    while(!states.empty()){
+        State &next = states.front();
+        if(next.isSolutionOf(m)){
+            std::cout << "Found solution !" << std::endl;
+            next.applyTo(m);
+            std::cout << m.toString() << "\n";
+            break;
+        }
+        next.computeNextStates(m, states);
+        states.pop();
+    }
 
-    Map m = parseFile(argv[1]);
-    std::cout << m.toString() << "\n";
-    const Move &lastMove = m.CalculateMoves();
-    std::cout << lastMove.originalMap.toString() << "\n";
-    std::cout << lastMove.originalMap.width() << "\n";
     return 0;
 }
