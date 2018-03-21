@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <queue>
+#include <string>
 
 enum CellsTypes {
     Empty = 0,
@@ -17,21 +18,14 @@ enum CellsTypes {
 };
 
 struct Move;
+char toChar(int code);
 
 class Map {
 public:
     Map();
     Map(int width, int height);
 
-    int getWidth() const;
-
-    void setWidth(int width);
-
-    int getHeight() const;
-
-    void setHeight(int height);
-
-    int CalculateMoves();
+    Move CalculateMoves();
 
     bool isComplete() const;
 
@@ -43,22 +37,48 @@ public:
 
     void SetStart(int x, int y);
 
-    int GetXY(int x, int y);
+    CellsTypes GetXY(int x, int y);
 
-    const std::vector<std::vector<int>> &getMap() const;
+    int width() const
+    {
+        return m_width;
+    }
 
-    void setMap(const std::vector<std::vector<int>> &map);
+    std::string toString() const;
 
 private:
     bool isValid(int x, int y) const;
 
     void addMoves(int x, int y, std::queue<Move> &q, int treeDepth) const;
 
-    int width;
+    int m_width;
     int height;
     std::vector<std::vector<int>> map;
 
     int xStart, yStart;
+};
+
+struct Move{
+    Move(){}
+
+    Move(int x, int y, int dirX, int dirY, int idx, const Map &origin):
+        x(x),
+        y(y),
+        dx(dirX),
+        dy(dirY),
+        index(idx),
+        originalMap(origin){
+
+    }
+
+    void performMove(){
+        originalMap.performMove(*this);
+    }
+
+    int x,y,dx,dy;/* coordinates from, direction*/
+    int index;/* depth of tree */
+    Map originalMap;
+
 };
 
 

@@ -3,37 +3,50 @@
 //
 
 #include "Map.h"
+#include <sstream>
 #include <iostream>
 
-struct Move{
-    Move(int x, int y, int dirX, int dirY, int idx, const Map &origin):
-        x(x),
-        y(y),
-        dx(dirX),
-        dy(dirY),
-        index(idx),
-        originalMap(origin){
+static Move emptyMove;
 
+
+char toChar(int cCode)
+{
+    if(cCode == Wall){
+        return '#';
+    }else if(cCode == Player){
+        return 'P';
+    }else if(cCode == Box){
+        return 'o';
+    }else if(cCode == Target){
+        return 'x';
+    }else if(cCode == (Target | Box)){
+        return '+';
+    }else{
+        return ' ';
     }
-
-    void performMove(){
-        originalMap.performMove(*this);
-    }
-
-    int x,y,dx,dy;/* coordinates from, coordinates to */
-    int index;/* depth of tree */
-    Map originalMap;
-
-};
+}
 
 Map::Map(){}
 
 Map::Map(int width, int height):
 map(height),
-width(width),
+m_width(width),
 height(height){
     for(int i = 0; i < height;++i)
         map[i].resize(width);
+}
+
+std::string Map::toString() const
+{
+    std::stringstream ss;
+    for(int y = 0; y < height; ++y){
+        for(int x = 0; x < m_width; ++x){
+            ss << toChar(map[y][x]);
+        }
+        ss << "\n";
+    }
+
+    return ss.str();
 }
 
 void Map::addMoves(int x, int y, std::queue<Move> &q, int treeDepth) const
@@ -74,19 +87,20 @@ void Map::SetStart(int x, int y)
     yStart = y;
 }
 
-int Map::CalculateMoves()
+Move Map::CalculateMoves()
 {
     std::queue<Move> nxtMoves;
     addMoves(xStart, yStart, nxtMoves, 0);
 
     while(!nxtMoves.empty()){
-        Move m = nxtMoves.front();
-        nxtMoves.pop();
+        Move &m = nxtMoves.front();
         m.performMove();
-        if(m.originalMap.isComplete())return m.index;
+        if(m.originalMap.isComplete())
+            return nxtMoves.front();
         m.originalMap.addMoves(m.x + m.dx, m.y + m.dy, nxtMoves, m.index+1);
+        nxtMoves.pop();
     }
-    return -1;//failed :(
+    return emptyMove;
 }
 
 void Map::SetXY(int x, int y, int type)
@@ -107,7 +121,7 @@ bool Map::isComplete() const
 
 bool Map::isValid(int x, int y) const
 {
-    return x >= 0 && y >= 0 && x < width && y < height;
+    return x >= 0 && y >= 0 && x < m_width && y < height;
 }
 
 bool Map::isAccessible(int x, int y, int xDir, int yDir) const
