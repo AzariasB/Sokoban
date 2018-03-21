@@ -37,14 +37,22 @@ public:
 
     void SetStart(int x, int y);
 
-    CellsTypes GetXY(int x, int y);
+    int GetXY(int x, int y);
 
     int width() const
     {
         return m_width;
     }
 
+    void setM_width(int m_width);
+
+    void setHeight(int height);
+
+    void setMap(const std::vector<std::vector<int>> &map);
+
     std::string toString() const;
+
+    const std::vector<std::vector<int>> &getMap() const;
 
 private:
     bool isValid(int x, int y) const;
