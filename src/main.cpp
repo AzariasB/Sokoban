@@ -14,9 +14,9 @@ Map parseFile(const std::string &mapName)
 
     int width = 0;
     int height = 0;
-    mapF >> width;
-    mapF.ignore();// comma
     mapF >> height;
+    mapF.ignore();// comma
+    mapF >> width;
     mapF.ignore();// \n
 
     std::cout << "Width = " << width << " - height = " << height << std::endl;
@@ -26,14 +26,13 @@ Map parseFile(const std::string &mapName)
         for(int x = 0; x < width; ++x){// read all lines
             int value;
             mapF >> value;
-            std::cout << value << " ";
-            mapF.ignore();// comma or \n
+            mapF.ignore();// comma
             if( (value & Player) == Player){
                 mMap.SetStart(x,y);
             }
             mMap.SetXY(x, y, value);
         }
-        std::cout << "\n";
+        mapF.ignore();// \n
     }
 
     mapF.close();
@@ -49,7 +48,10 @@ int main(int argc, char **argv) {
     }
 
 
-    Map m = parseFile(argv[argc]);
-    std::cout << m.CalculateMoves() << std::endl;
+    Map m = parseFile(argv[1]);
+    std::cout << m.toString() << "\n";
+    const Move &lastMove = m.CalculateMoves();
+    std::cout << lastMove.originalMap.toString() << "\n";
+    std::cout << lastMove.originalMap.width() << "\n";
     return 0;
 }
