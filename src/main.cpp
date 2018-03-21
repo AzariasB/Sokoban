@@ -1,6 +1,9 @@
+
 #include <iostream>
+#include "Parser.h"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    Parser p;
+    p.parseFile("../data/soko1.txt");
     return 0;
 }
