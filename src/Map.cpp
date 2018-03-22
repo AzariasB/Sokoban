@@ -6,6 +6,16 @@
 #include <sstream>
 #include <iostream>
 
+const Point Map::top = {0,-1};
+const Point Map::right = {1,0};
+const Point Map::down = {0,1};
+const Point Map::left = {-1,0};
+const Point Map::topLeft = {-1,-1};
+const Point Map::topRight = {1,-1};
+const Point Map::downLeft = {-1,1};
+const Point Map::downRight = {1,1};
+
+
 char toChar(int cCode)
 {
     if(cCode == Wall){
@@ -41,6 +51,62 @@ int &Map::at(const Point &p)
 const int &Map::at(const Point &p) const
 {
     return map[p.y][p.x];
+}
+
+void Map::reset()
+{
+    for(int y = 0; y < map.size(); ++y){
+        for(int x = 0; x < map[y].size(); ++x){
+            if( (map[y][x] & Box) == Box )
+                map[y][x] ^= Box;
+            else if( (map[y][x] & Player) == Player)
+                map[y][x] ^= Player;
+        }
+    }
+}
+
+bool Map::hasBlocking(const Point &p) const
+{
+    return hasWall(p) || hasBox(p);
+}
+
+bool Map::hasWall(const Point &p) const
+{
+    return (map[p.y][p.x] & Wall) == Wall;
+}
+
+bool Map::hasTarget(const Point &p) const
+{
+    return (map[p.y][p.x] & Target) == Target;
+}
+
+bool Map::hasBox(const Point &p) const
+{
+    return (map[p.y][p.x] & Box) == Box;
+}
+
+bool Map::isStuck(const Point &p) const
+{
+    return  ( hasWall(p+left)  && hasWall(p+top)  ) ||
+            ( hasWall(p+left)  && hasWall(p+down) ) ||
+            ( hasWall(p+right) && hasWall(p+top)  ) ||
+            ( hasWall(p+right) && hasWall(p+down) ) ||
+            ( hasBlocking(p+left) && hasBlocking(p+topLeft) && hasBlocking(p+top) ) ||
+            ( hasBlocking(p+left) && hasBlocking(p+downLeft) && hasBlocking(p+down) ) ||
+            ( hasBlocking(p+right) && hasBlocking(p+downRight) && hasBlocking(p+down) ) ||
+            ( hasBlocking(p+right) && hasBlocking(p+topRight) && hasBlocking(p+top) );
+
+}
+
+bool Map::isUseless() const
+{
+    for(int y = 0; y < map.size(); ++y){
+        for(int x = 0; x < map[y].size(); ++x){
+            Point p(x,y);
+            if(hasBox(p) && !hasTarget(p) && isStuck(p))return true;
+        }
+    }
+    return false;
 }
 
 std::string Map::toString() const

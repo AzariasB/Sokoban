@@ -64,9 +64,7 @@ int main(int argc, char **argv) {
         next->computeNextStates(m, next, states, anc);
         states.pop();
     }
-
     std::stack<std::shared_ptr<State>> order;
-    State dummy;
     if(finalState){
         std::cout << "Found solution !\n";
         while(finalState != root){
@@ -80,7 +78,9 @@ int main(int argc, char **argv) {
             order.pop();
             st->applyTo(m);
             std::cout << m.toString() << "\n";
-            dummy.extractFrom(m);
+            std::cin.ignore();
+
+            m.reset();
         }
     }
 

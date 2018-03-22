@@ -63,6 +63,11 @@ struct Point{
         return Point(x + other.x, y + other.y);
     }
 
+    bool operator==(const Point & other) const
+    {
+        return x == other.x && y == other.y;
+    }
+
     int8 x,y;
 };
 
@@ -81,8 +86,14 @@ public:
 
     void extractFrom(Map &map);
 
+    bool operator==(const State & other) const;
+
 private:
+    static std::list<std::shared_ptr<State>> knownStates;
+
     static const std::array<Point, 4> CARDINALS;
+
+    std::shared_ptr<State> getSate(const State &origin);
 
     void setPlayerPosition(int8 x, int8 y);
 

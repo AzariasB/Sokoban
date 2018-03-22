@@ -31,9 +31,14 @@
 #include "State.hpp"
 #include "Map.h"
 
+#include <algorithm>
+#include <iostream>
+
 const std::array<Point,4> State::CARDINALS = {{
     {0,1},{0,-1},{1,0},{-1,0}
 }};
+
+std::list<std::shared_ptr<State>> State::knownStates = {};
 
 State::State()
 {
@@ -84,17 +89,48 @@ void State::applyMove(const Point &move, Map &map)
     }
 }
 
+bool State::operator ==(const State &other) const
+{
+    return m_ppos == other.m_ppos &&
+            m_boxes == other.m_boxes;
+}
+
 void State::computeNextStates(Map &map, std::shared_ptr<State> &pred, std::queue<std::shared_ptr<State>> &stateQueue, ancestors &anc)
 {
     for(const Point &card : CARDINALS){
+        applyTo(map);
         if(map.isAccessible(m_ppos, card)){
-            applyTo(map);
             applyMove(card, map);
-            stateQueue.emplace(std::make_shared<State>());
-            anc[stateQueue.back()] = pred;
-            stateQueue.back()->extractFrom(map);
+            if(!map.isUseless()){
+                State s;
+                s.extractFrom(map);
+                std::shared_ptr<State> nwState = {};
+                if(!(nwState = getSate(s))){
+                    continue;//state already exists, move on
+                }
+                stateQueue.emplace(nwState);
+                nwState->extractFrom(map);
+                anc[nwState] = pred;
+                continue;
+            }
         }
+        map.reset();
     }
+}
+
+std::shared_ptr<State> State::getSate(const State &origin)
+{
+    auto found = std::find_if(knownStates.begin(), knownStates.end(), [&origin](const auto &ptr){
+        return origin == *ptr;
+    });
+
+    if(found == knownStates.end()){
+        std::shared_ptr<State> st = std::make_shared<State>(origin);
+        knownStates.emplace_back(st);
+        return st;
+    }
+
+    return {};//already exist => not treating it
 }
 
 void State::extractFrom(Map &map)
