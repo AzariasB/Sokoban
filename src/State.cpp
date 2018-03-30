@@ -38,11 +38,47 @@ const std::array<Point,4> State::CARDINALS = {{
     {0,1},{0,-1},{1,0},{-1,0}
 }};
 
-std::vector<std::shared_ptr<State>> State::knownStates = []() -> std::vector<std::shared_ptr<State>> {
-    std::vector<std::shared_ptr<State>> vec;
-    vec.reserve(1 << 20);
-    return vec;
-}();
+Tree State::knownStates = {};
+
+void Tree::insert(const Point &player, const std::vector<Point> &boxes)
+{
+    root[player.x][player.y].insert(boxes, 0);
+}
+
+bool Tree::contains(const Point &player, const std::vector<Point> &boxes)
+{
+    if(root.find(player.x) == root.end())return false;
+    auto &f = root[player.x];
+    if(f.find(player.y) == f.end())return false;
+
+    return f[player.y].has(boxes, 0);
+}
+
+void Tree::Node::insert(const std::vector<Point> &points, int index)
+{
+    const Point &p = points[index];
+    value = p.x;
+    if(index == points.size() -1)return;
+
+    if(childs.size() <= p.y){
+        childs.resize(p.y + 1);
+    }
+
+    childs[p.y].insert(points, index + 1);
+}
+
+bool Tree::Node::has(const std::vector<Point> &points, int index)
+{
+    if(index == points.size())return true;
+
+    const Point &p = points[index];
+    if(p.x != value)return false;
+
+    if(childs.size() <= p.y)return false;
+
+    Node &child = childs[p.y];
+    return child.value > -1 && child.has(points, index+ 1);
+}
 
 State::State()
 {
@@ -124,17 +160,10 @@ void State::computeNextStates(Map &map, std::shared_ptr<State> &pred, std::vecto
 
 std::shared_ptr<State> State::getSate(const State &origin)
 {
-    auto found = std::find_if(knownStates.begin(), knownStates.end(), [&origin](const auto &ptr){
-        return origin == (*ptr);
-    });
+    if(knownStates.contains(origin.m_ppos, origin.m_boxes))return {};
 
-    if(found == knownStates.end()){
-        std::shared_ptr<State> st = std::make_shared<State>(origin);
-        knownStates.emplace_back(st);
-        return st;
-    }
-
-    return {};//already exist => not treating it
+    knownStates.insert(origin.m_ppos, origin.m_boxes);
+    return std::make_shared<State>(origin);
 }
 
 void State::extractFrom(Map &map)

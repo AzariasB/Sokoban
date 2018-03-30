@@ -36,6 +36,7 @@
 #include <queue>
 #include <memory>
 #include <unordered_map>
+#include <map>
 #include <algorithm>
 #include <array>
 
@@ -90,6 +91,37 @@ struct Point{
     int8 x,y;
 };
 
+class Tree{
+public:
+
+    Tree(){}
+
+    void insert(const Point &player, const std::vector<Point> &boxes);
+
+    bool contains(const Point &player, const std::vector<Point> &boxes);
+
+    virtual ~Tree(){}
+
+private:
+
+    struct Node{
+        int value = -1;
+        std::vector<Node> childs;
+
+        Node(){
+            childs.reserve(64);
+        }
+
+        void insert(const std::vector<Point> &points, int index);
+
+        bool has(const std::vector<Point> &points, int index);
+
+
+    };
+
+    std::unordered_map<int, std::unordered_map<int, Node>> root;
+};
+
 
 class State
 {
@@ -109,7 +141,7 @@ public:
     bool operator==(const State & other) const;
 
 
-    static std::vector<std::shared_ptr<State>> knownStates;
+    static Tree knownStates;
 private:
 
     static const std::array<Point, 4> CARDINALS;

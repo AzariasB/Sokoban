@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
         order.emplace(root);
         std::cout << "In " << order.size() << " moves\n";
         std::cout << "Explored " << states.size() << " states\n";
-        std::cout << "Known states "  << State::knownStates.size() << " states\n";
+        //std::cout << "Known states "  << State::knownStates.size() << " states\n";
 
         /*
         while(!order.empty()){
