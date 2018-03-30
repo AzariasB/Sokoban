@@ -40,7 +40,7 @@ const std::array<Point,4> State::CARDINALS = {{
 
 std::vector<std::shared_ptr<State>> State::knownStates = []() -> std::vector<std::shared_ptr<State>> {
     std::vector<std::shared_ptr<State>> vec;
-    vec.reserve(100000000);
+    vec.reserve(1 << 20);
     return vec;
 }();
 
@@ -140,8 +140,8 @@ std::shared_ptr<State> State::getSate(const State &origin)
 void State::extractFrom(Map &map)
 {
     auto &m = map.get();
-    for(int y = 1; y < m.size() - 1; ++y){
-        for(int x = 1; x < m[y].size() - 1; ++x){
+    for(int y = 1, s = m.size(); y < s - 1; ++y){
+        for(int x = 1, ss = m[y].size(); x < ss - 1; ++x){
             int &i = m[y][x];
             if((i & Player) == Player){
                 setPlayerPosition(x,y);
