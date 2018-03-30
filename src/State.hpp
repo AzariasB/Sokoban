@@ -59,9 +59,27 @@ struct Point{
 
     Point(int8 _x, int8 _y) : x(_x), y(_y){}
 
+    Point operator -(const Point &other) const{
+        return Point(x - other.x, y - other.y);
+    }
+
     Point operator+(const Point &other) const
     {
         return Point(x + other.x, y + other.y);
+    }
+
+    Point &operator -=(const Point &other)
+    {
+        x -= other.x;
+        y -= other.y;
+        return *this;
+    }
+
+    Point &operator +=(const Point &other)
+    {
+        x += other.x;
+        y += other.y;
+        return *this;
     }
 
     bool operator==(const Point & other) const
@@ -90,8 +108,9 @@ public:
 
     bool operator==(const State & other) const;
 
-private:
+
     static std::vector<std::shared_ptr<State>> knownStates;
+private:
 
     static const std::array<Point, 4> CARDINALS;
 

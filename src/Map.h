@@ -43,7 +43,9 @@ private:
     static const Point downLeft;
     static const Point downRight;
 
-    bool isStuck(const Point &p) const;
+    inline bool isStuck(const Point &p) const;
+
+    inline bool  againstWall(const Point &p, const Point &test, const Point &d1) const;
 
     inline bool hasWall(const Point &p) const;
 

@@ -87,6 +87,7 @@ bool Map::hasBox(const Point &p) const
 
 bool Map::isStuck(const Point &p) const
 {
+    //three blocings
     bool lBlocking = hasBlocking(p+left),
             rBlocking = hasBlocking(p + right),
             tBlocking = hasBlocking(p + top),
@@ -98,11 +99,48 @@ bool Map::isStuck(const Point &p) const
             rBlocking && hasBlocking(p + topRight) && tBlocking)
         return true;
 
-    return  ( hasWall(p+left)  && hasWall(p+top)  ) ||
-            ( hasWall(p+left)  && hasWall(p+down) ) ||
-            ( hasWall(p+right) && hasWall(p+top)  ) ||
-            ( hasWall(p+right) && hasWall(p+down) );
+    //Surrounded by walls
+    bool lWall = hasWall(left + p);
+    bool rWall = hasWall(right + p);
+    bool tWall = hasWall(top + p);
+    bool dWall = hasWall(down + p);
 
+    bool surrounded =  ( lWall  && tWall  ) ||
+            ( lWall && dWall ) ||
+            ( rWall && tWall  ) ||
+            ( rWall && dWall );
+
+    if(surrounded)return true;
+
+    //check if against wall and no target
+    if(tWall)
+        return againstWall(p, top, left);
+
+    if(dWall)
+        return againstWall(p, down, left);
+
+    if(rWall)
+        return againstWall(p, right, top);
+
+    if(lWall)
+        return againstWall(p, left, top);
+
+    return false;
+}
+
+bool Map::againstWall(const Point &p, const Point &test, const Point &d1) const
+{
+    Point cp = (p+d1);
+    while(!hasWall(cp)){
+        if(!hasWall(cp + test) || hasTarget(cp))return false;
+        cp += d1;
+    }
+    cp = (p-d1);
+    while(!hasWall(cp)){
+        if(!hasWall(cp + test) || hasTarget(cp))return false;
+        cp -= d1;
+    }
+    return true;
 }
 
 bool Map::isUseless() const

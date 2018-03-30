@@ -114,7 +114,7 @@ void State::computeNextStates(Map &map, std::shared_ptr<State> &pred, std::vecto
                 }
                 stateQueue.emplace_back(nwState);
                 nwState->extractFrom(map);
-                //anc[nwState] = pred;
+                anc[nwState] = pred;
                 continue;
             }
         }
@@ -125,7 +125,7 @@ void State::computeNextStates(Map &map, std::shared_ptr<State> &pred, std::vecto
 std::shared_ptr<State> State::getSate(const State &origin)
 {
     auto found = std::find_if(knownStates.begin(), knownStates.end(), [&origin](const auto &ptr){
-        return origin == *ptr;
+        return origin == (*ptr);
     });
 
     if(found == knownStates.end()){
