@@ -50,28 +50,37 @@ int main(int argc, char **argv) {
     Map m = parseFile(argv[1]);
     root->extractFrom(m);
 
-    std::queue<std::shared_ptr<State>> states;
+
+    std::vector<std::shared_ptr<State>> states;
+    int cursor = 0;
+    states.reserve(100000000);
     ancestors anc;
     std::shared_ptr<State> finalState = {};
 
-    states.push(root);
-    while(!states.empty()){
-        auto &next = states.front();
+    states.emplace_back(root);
+    while(cursor < states.size()){
+        auto &next = states[cursor];
         if(next->isSolutionOf(m)){
             finalState = next;
             break;
         }
         next->computeNextStates(m, next, states, anc);
-        states.pop();
+        cursor++;
     }
+
+    if(finalState)
+        std::cout << "Found solution\n";
+
+    /*
     std::stack<std::shared_ptr<State>> order;
     if(finalState){
         std::cout << "Found solution !\n";
-        while(finalState != root){
+       while(finalState != root){
             order.emplace(finalState);
             finalState = anc[finalState];
         }
         order.emplace(root);
+        std::cout << "In " << order.size() << " moves\n";
 
         while(!order.empty()){
             auto &st = order.top();
@@ -79,10 +88,9 @@ int main(int argc, char **argv) {
             st->applyTo(m);
             std::cout << m.toString() << "\n";
             std::cin.ignore();
-
             m.reset();
         }
-    }
+    }*/
 
     return 0;
 }

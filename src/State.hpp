@@ -36,6 +36,7 @@
 #include <queue>
 #include <memory>
 #include <unordered_map>
+#include <algorithm>
 #include <array>
 
 typedef signed char int8;
@@ -71,6 +72,7 @@ struct Point{
     int8 x,y;
 };
 
+
 class State
 {
 public:
@@ -82,14 +84,14 @@ public:
 
     void applyMove(const Point & move, Map &map);
 
-    void computeNextStates(Map &map, std::shared_ptr<State> &pred, std::queue<std::shared_ptr<State> > &stateQueue, ancestors &anc);
+    void computeNextStates(Map &map, std::shared_ptr<State> &pred, std::vector<std::shared_ptr<State> > &stateQueue, ancestors &anc);
 
     void extractFrom(Map &map);
 
     bool operator==(const State & other) const;
 
 private:
-    static std::list<std::shared_ptr<State>> knownStates;
+    static std::vector<std::shared_ptr<State>> knownStates;
 
     static const std::array<Point, 4> CARDINALS;
 
@@ -101,7 +103,7 @@ private:
 
     Point m_ppos;
 
-    std::list<Point> m_boxes;
+    std::vector<Point> m_boxes;
 
 };
 

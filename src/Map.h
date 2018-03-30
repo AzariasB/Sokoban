@@ -45,13 +45,13 @@ private:
 
     bool isStuck(const Point &p) const;
 
-    bool hasWall(const Point &p) const;
+    inline bool hasWall(const Point &p) const;
 
-    bool hasTarget(const Point &p) const;
+    inline bool hasTarget(const Point &p) const;
 
-    bool hasBox(const Point &p) const;
+    inline bool hasBox(const Point &p) const;
 
-    bool hasBlocking(const Point &p) const;
+    inline bool hasBlocking(const Point &p) const;
 
     std::vector<std::vector<int>> map;
 };

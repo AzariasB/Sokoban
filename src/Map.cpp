@@ -87,21 +87,28 @@ bool Map::hasBox(const Point &p) const
 
 bool Map::isStuck(const Point &p) const
 {
+    bool lBlocking = hasBlocking(p+left),
+            rBlocking = hasBlocking(p + right),
+            tBlocking = hasBlocking(p + top),
+            dBlocking = hasBlocking(p + down);
+
+    if(lBlocking && hasBlocking(p + downLeft) && dBlocking ||
+            lBlocking && hasBlocking(p+topLeft) && tBlocking ||
+            rBlocking && hasBlocking(p + downRight) && dBlocking ||
+            rBlocking && hasBlocking(p + topRight) && tBlocking)
+        return true;
+
     return  ( hasWall(p+left)  && hasWall(p+top)  ) ||
             ( hasWall(p+left)  && hasWall(p+down) ) ||
             ( hasWall(p+right) && hasWall(p+top)  ) ||
-            ( hasWall(p+right) && hasWall(p+down) ) ||
-            ( hasBlocking(p+left) && hasBlocking(p+topLeft) && hasBlocking(p+top) ) ||
-            ( hasBlocking(p+left) && hasBlocking(p+downLeft) && hasBlocking(p+down) ) ||
-            ( hasBlocking(p+right) && hasBlocking(p+downRight) && hasBlocking(p+down) ) ||
-            ( hasBlocking(p+right) && hasBlocking(p+topRight) && hasBlocking(p+top) );
+            ( hasWall(p+right) && hasWall(p+down) );
 
 }
 
 bool Map::isUseless() const
 {
-    for(int y = 0; y < map.size(); ++y){
-        for(int x = 0; x < map[y].size(); ++x){
+    for(int y = 1; y < map.size() - 1; ++y){
+        for(int x = 1; x < map[y].size() - 1; ++x){
             Point p(x,y);
             if(hasBox(p) && !hasTarget(p) && isStuck(p))return true;
         }

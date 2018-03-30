@@ -38,11 +38,15 @@ const std::array<Point,4> State::CARDINALS = {{
     {0,1},{0,-1},{1,0},{-1,0}
 }};
 
-std::list<std::shared_ptr<State>> State::knownStates = {};
+std::vector<std::shared_ptr<State>> State::knownStates = []() -> std::vector<std::shared_ptr<State>> {
+    std::vector<std::shared_ptr<State>> vec;
+    vec.reserve(100000000);
+    return vec;
+}();
 
 State::State()
 {
-
+    m_boxes.reserve(16);
 }
 
 void State::setPlayerPosition(int8 x, int8 y)
@@ -60,7 +64,7 @@ void State::applyTo(Map &m)
 {
     m.at(m_ppos) |= Player;
 
-    for(const auto & box : m_boxes){
+    for(const Point& box : m_boxes){
         m.at(box) |= Box;
     }
 }
@@ -95,7 +99,7 @@ bool State::operator ==(const State &other) const
             m_boxes == other.m_boxes;
 }
 
-void State::computeNextStates(Map &map, std::shared_ptr<State> &pred, std::queue<std::shared_ptr<State>> &stateQueue, ancestors &anc)
+void State::computeNextStates(Map &map, std::shared_ptr<State> &pred, std::vector<std::shared_ptr<State>> &stateQueue, ancestors &anc)
 {
     for(const Point &card : CARDINALS){
         applyTo(map);
@@ -108,9 +112,9 @@ void State::computeNextStates(Map &map, std::shared_ptr<State> &pred, std::queue
                 if(!(nwState = getSate(s))){
                     continue;//state already exists, move on
                 }
-                stateQueue.emplace(nwState);
+                stateQueue.emplace_back(nwState);
                 nwState->extractFrom(map);
-                anc[nwState] = pred;
+                //anc[nwState] = pred;
                 continue;
             }
         }
@@ -136,8 +140,8 @@ std::shared_ptr<State> State::getSate(const State &origin)
 void State::extractFrom(Map &map)
 {
     auto &m = map.get();
-    for(int y = 0; y < m.size(); ++y){
-        for(int x = 0; x < m[y].size(); ++x){
+    for(int y = 1; y < m.size() - 1; ++y){
+        for(int x = 1; x < m[y].size() - 1; ++x){
             int &i = m[y][x];
             if((i & Player) == Player){
                 setPlayerPosition(x,y);
