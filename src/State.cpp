@@ -33,16 +33,14 @@
 
 #include <algorithm>
 #include <iostream>
+#include <sstream>
+#include <bitset>
 
 const std::array<Point,4> State::CARDINALS = {{
     {0,1},{0,-1},{1,0},{-1,0}
 }};
 
-std::vector<std::shared_ptr<State>> State::knownStates = []() -> std::vector<std::shared_ptr<State>> {
-    std::vector<std::shared_ptr<State>> vec;
-    vec.reserve(1 << 20);
-    return vec;
-}();
+std::unordered_map<int64_t, bool> State::knownStates = {};
 
 State::State()
 {
@@ -67,6 +65,20 @@ void State::applyTo(Map &m)
     for(const Point& box : m_boxes){
         m.at(box) |= Box;
     }
+}
+
+int64_t State::toInt64() const
+{
+    int64_t res = 0;
+    res |= m_ppos.toInt6();
+
+    int shift = 1;
+    for(const Point &p : m_boxes){
+        res |= (p.toInt6() << (shift * 6));
+        ++shift;
+    }
+
+    return res;
 }
 
 bool State::isSolutionOf(const Map &m)
@@ -108,10 +120,10 @@ void State::computeNextStates(Map &map, std::shared_ptr<State> &pred, std::vecto
             if(!map.isUseless()){
                 State s;
                 s.extractFrom(map);
-                std::shared_ptr<State> nwState = {};
-                if(!(nwState = getSate(s))){
+                if(stateExists(s)){
                     continue;//state already exists, move on
                 }
+                std::shared_ptr<State> nwState = std::make_shared<State>(s);
                 stateQueue.emplace_back(nwState);
                 nwState->extractFrom(map);
                 anc[nwState] = pred;
@@ -122,34 +134,27 @@ void State::computeNextStates(Map &map, std::shared_ptr<State> &pred, std::vecto
     }
 }
 
-std::shared_ptr<State> State::getSate(const State &origin)
+bool State::stateExists(const State &origin)
 {
-    auto found = std::find_if(knownStates.begin(), knownStates.end(), [&origin](const auto &ptr){
-        return origin == (*ptr);
-    });
+    int64_t encoded = origin.toInt64();
 
-    if(found == knownStates.end()){
-        std::shared_ptr<State> st = std::make_shared<State>(origin);
-        knownStates.emplace_back(st);
-        return st;
-    }
-
-    return {};//already exist => not treating it
+    bool &val = knownStates[origin.toInt64()];
+    if(val)return true;
+    val = true;
+    return false;
 }
 
 void State::extractFrom(Map &map)
 {
     auto &m = map.get();
-    for(int y = 1, s = m.size(); y < s - 1; ++y){
-        for(int x = 1, ss = m[y].size(); x < ss - 1; ++x){
-            int &i = m[y][x];
-            if((i & Player) == Player){
-                setPlayerPosition(x,y);
-                i ^= Player;
-            }else if((i & Box) == Box){
-                addBoxPosition(x,y);
-                i ^= Box;
-            }
+    for(const Point &p : map.getViablePositions()){
+        int &i = map.at(p);
+        if((i & Player) == Player){
+            setPlayerPosition(p.x,p.y);
+            i ^= Player;
+        }else if((i & Box) == Box){
+            addBoxPosition(p.x,p.y);
+            i ^= Box;
         }
     }
 }

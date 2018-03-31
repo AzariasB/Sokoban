@@ -82,6 +82,11 @@ struct Point{
         return *this;
     }
 
+    int64_t toInt6() const
+    {
+        return 0x3F & (((x-1) & 0x07) |  ( ((y-1) & 0x07) << 3));
+    }
+
     bool operator==(const Point & other) const
     {
         return x == other.x && y == other.y;
@@ -106,15 +111,17 @@ public:
 
     void extractFrom(Map &map);
 
+    int64_t toInt64() const;
+
     bool operator==(const State & other) const;
 
 
-    static std::vector<std::shared_ptr<State>> knownStates;
+    static std::unordered_map<int64_t, bool> knownStates;
 private:
 
     static const std::array<Point, 4> CARDINALS;
 
-    std::shared_ptr<State> getSate(const State &origin);
+    bool stateExists(const State &origin);
 
     void setPlayerPosition(int8 x, int8 y);
 

@@ -48,6 +48,23 @@ int &Map::at(const Point &p)
     return map[p.y][p.x];
 }
 
+void Map::detectViablePositions()
+{
+    viablePositions.reserve(64);
+    for(int y = 0; y < map.size(); ++y){
+        for(int x = 0; x < map.size(); ++x){
+            if( (map[y][x] & Wall) != Wall){
+                viablePositions.emplace_back(x,y);
+            }
+        }
+    }
+}
+
+const std::vector<Point> &Map::getViablePositions() const
+{
+    return viablePositions;
+}
+
 const int &Map::at(const Point &p) const
 {
     return map[p.y][p.x];
@@ -55,13 +72,13 @@ const int &Map::at(const Point &p) const
 
 void Map::reset()
 {
-    for(int y = 0; y < map.size(); ++y){
-        for(int x = 0; x < map[y].size(); ++x){
-            if( (map[y][x] & Box) == Box )
-                map[y][x] ^= Box;
-            else if( (map[y][x] & Player) == Player)
-                map[y][x] ^= Player;
-        }
+    for(const Point &p : viablePositions){
+        int &v = at(p);
+        if((v & Box) == Box)
+            v ^= Box;
+        else if( (v & Player) == Player)
+            v ^= Player;
+
     }
 }
 
@@ -145,11 +162,8 @@ bool Map::againstWall(const Point &p, const Point &test, const Point &d1) const
 
 bool Map::isUseless() const
 {
-    for(int y = 1; y < map.size() - 1; ++y){
-        for(int x = 1; x < map[y].size() - 1; ++x){
-            Point p(x,y);
-            if(hasBox(p) && !hasTarget(p) && isStuck(p))return true;
-        }
+    for(const Point &p : viablePositions){
+        if(hasBox(p) && !hasTarget(p) && isStuck(p))return true;
     }
     return false;
 }

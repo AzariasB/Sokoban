@@ -33,6 +33,10 @@ public:
 
     std::vector<std::vector<int>> &get(){return map;}
 
+    void detectViablePositions();
+
+    const std::vector<Point> &getViablePositions() const;
+
 private:
     static const Point left;
     static const Point top;
@@ -56,6 +60,8 @@ private:
     inline bool hasBlocking(const Point &p) const;
 
     std::vector<std::vector<int>> map;
+
+    std::vector<Point> viablePositions;
 };
 
 

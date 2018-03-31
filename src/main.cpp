@@ -35,6 +35,7 @@ Map parseFile(const std::string &mapName)
     }
 
     mapF.close();
+    mMap.detectViablePositions();
     return mMap;
 }
 
