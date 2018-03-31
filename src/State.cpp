@@ -111,7 +111,7 @@ bool State::operator ==(const State &other) const
             m_boxes == other.m_boxes;
 }
 
-void State::computeNextStates(Map &map, std::shared_ptr<State> &pred, std::vector<std::shared_ptr<State>> &stateQueue, ancestors &anc)
+void State::computeNextStates(Map &map, int pred, std::vector<State> &stateQueue, std::unordered_map<int,int> &anc)
 {
     for(const Point &card : CARDINALS){
         applyTo(map);
@@ -120,13 +120,11 @@ void State::computeNextStates(Map &map, std::shared_ptr<State> &pred, std::vecto
             if(!map.isUseless()){
                 State s;
                 s.extractFrom(map);
-                if(stateExists(s)){
-                    continue;//state already exists, move on
-                }
-                std::shared_ptr<State> nwState = std::make_shared<State>(s);
-                stateQueue.emplace_back(nwState);
-                nwState->extractFrom(map);
-                anc[nwState] = pred;
+                if(stateExists(s))continue;//state already exists, move on
+
+                s.extractFrom(map);
+                stateQueue.push_back(s);
+                anc[stateQueue.size() - 1] = pred;
                 continue;
             }
         }

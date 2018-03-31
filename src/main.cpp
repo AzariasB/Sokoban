@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <stack>
+#include <chrono>
 #include "State.hpp"
 #include "Map.h"
 
@@ -47,51 +47,50 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    std::shared_ptr<State> root = std::make_shared<State>();
     Map m = parseFile(argv[1]);
-    root->extractFrom(m);
+    std::vector<State> states;
+    states.emplace_back();
+
+    states.back().extractFrom(m);
 
 
-    std::vector<std::shared_ptr<State>> states;
     int cursor = 0;
     states.reserve(100000000);
-    ancestors anc;
-    std::shared_ptr<State> finalState = {};
+    std::unordered_map<int,int> anc;
+    int finalState = -1;
 
-    states.emplace_back(root);
     while(cursor < states.size()){
         auto &next = states[cursor];
-        if(next->isSolutionOf(m)){
-            finalState = next;
+        if(next.isSolutionOf(m)){
+            finalState = cursor;
             break;
         }
-        next->computeNextStates(m, next, states, anc);
+        next.computeNextStates(m, cursor, states, anc);
         cursor++;
     }
 
-    std::stack<std::shared_ptr<State>> order;
+    std::vector<int> order;
+    order.reserve(64);
     if(finalState){
         std::cout << "Found solution !\n";
-       while(finalState != root){
-            order.emplace(finalState);
+        while(finalState != 0){
+            order.push_back(finalState);
             finalState = anc[finalState];
         }
-        order.emplace(root);
+        order.push_back(0);
+
+
         std::cout << "In " << order.size() << " moves\n";
         std::cout << "Explored " << states.size() << " states\n";
         std::cout << "Known states "  << State::knownStates.size() << " states\n";
 
-        /*
-        while(!order.empty()){
-            auto &st = order.top();
-            order.pop();
-            st->applyTo(m);
+        for(int i = order.size() -1; i >= 0; --i){
+            State &s = states[order[i]];
+            s.applyTo(m);
             std::cout << m.toString() << "\n";
             std::cin.ignore();
             m.reset();
-        }*/
-
+        }
     }
-
     return 0;
 }

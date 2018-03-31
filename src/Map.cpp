@@ -52,7 +52,7 @@ void Map::detectViablePositions()
 {
     viablePositions.reserve(64);
     for(int y = 0; y < map.size(); ++y){
-        for(int x = 0; x < map.size(); ++x){
+        for(int x = 0; x < map[y].size(); ++x){
             if( (map[y][x] & Wall) != Wall){
                 viablePositions.emplace_back(x,y);
             }
