@@ -114,8 +114,8 @@ public:
     bool operator==(const State & other) const;
 
 
-    static std::unordered_map<int64_t, bool> knownStates;
 private:
+    static std::unordered_map<int64_t, bool> knownStates;
 
     static const std::array<Point, 4> CARDINALS;
 

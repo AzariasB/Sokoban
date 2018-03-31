@@ -40,8 +40,6 @@ Map parseFile(const std::string &mapName)
 }
 
 int main(int argc, char **argv) {
-    std::cout << argc << std::endl;
-
     if(argc < 2){
         std::cerr << "Must pass filename in parameter\n";
         return -1;
@@ -59,6 +57,7 @@ int main(int argc, char **argv) {
     std::unordered_map<int,int> anc;
     int finalState = -1;
 
+    auto start = std::chrono::system_clock::now();
     while(cursor < states.size()){
         auto &next = states[cursor];
         if(next.isSolutionOf(m)){
@@ -68,6 +67,8 @@ int main(int argc, char **argv) {
         next.computeNextStates(m, cursor, states, anc);
         cursor++;
     }
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsedSeconds = end - start;
 
     std::vector<int> order;
     order.reserve(64);
@@ -82,7 +83,7 @@ int main(int argc, char **argv) {
 
         std::cout << "In " << order.size() << " moves\n";
         std::cout << "Explored " << states.size() << " states\n";
-        std::cout << "Known states "  << State::knownStates.size() << " states\n";
+        std::cout << "Elapsed seconds : " << elapsedSeconds.count() << "\n";
 
         for(int i = order.size() -1; i >= 0; --i){
             State &s = states[order[i]];
