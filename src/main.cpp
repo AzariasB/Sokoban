@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
 
 
         std::cout << "In " << order.size() << " moves\n";
-        std::cout << "Explored " << states.size() << " states\n";
+        std::cout << "Explored " << cursor << " states\n";
         std::cout << "Elapsed seconds : " << elapsedSeconds.count() << "\n";
 
         for(int i = order.size() -1; i >= 0; --i){
