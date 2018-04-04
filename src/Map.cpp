@@ -197,5 +197,5 @@ bool Map::isAccessible(const Point &origin, const Point &dir) const
     //else => is Box : see if we can push it
     Point nxtPos = p + dir;
 
-    return isValid(nxtPos) && map[nxtPos.y][nxtPos.x] == Empty || map[nxtPos.y][nxtPos.x] == Target;
+    return isValid(nxtPos) && (map[nxtPos.y][nxtPos.x] == Empty || map[nxtPos.y][nxtPos.x] == Target);
 }
