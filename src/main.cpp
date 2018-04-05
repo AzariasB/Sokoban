@@ -1,3 +1,10 @@
+//
+// Created by
+// - Azarias Boutin
+// - Raphaël Haltz
+// - Quentin Journet
+//
+
 
 #include <iostream>
 #include <fstream>

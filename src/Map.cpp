@@ -1,6 +1,10 @@
 //
-// Created by Raphaël Haltz on 21/03/2018.
+// Created by
+// - Azarias Boutin
+// - Raphaël Haltz
+// - Quentin Journet
 //
+
 
 #include "Map.h"
 #include <sstream>
